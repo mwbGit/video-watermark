@@ -6,9 +6,6 @@ import com.harry.videowatermark.common.JsonUtil;
 import com.harry.videowatermark.common.TextUtil;
 import com.harry.videowatermark.model.VideoModel;
 import com.harry.videowatermark.service.VideoService;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,15 +28,15 @@ public class KuaiShouServiceImpl implements VideoService {
     public VideoModel parseUrl(String strUrl) {
         VideoModel videoModel = new VideoModel();
         try {
-
+            // 获取 短链接 URL
             String shortUrl = TextUtil.extractUrl(strUrl);
 
-            HashMap<String, String> headers = MapUtil.newHashMap();
-            headers.put("User-Agent", "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Mobile Safari/537.36");
-            String redirectUrl = HttpUtil.createGet(shortUrl).addHeaders(headers).execute().header("Location");
-            String body = HttpUtil.createGet(redirectUrl).addHeaders(headers).execute().body();
-            Document doc = Jsoup.parse(body);
+            // 获取重定向Url
+            String redirectUrl = TextUtil.redirectUrl(shortUrl);
 
+            // 获取数据  这里返回的数据是一个界面 数据在 script window.pageData= 中  无水印的视频字段 srcNoMark
+            String body = HttpUtil.createGet(redirectUrl).addHeaders(TextUtil.headers()).execute().body();
+            Document doc = Jsoup.parse(body);
             Elements scripts = doc.select("script");
             for (Element script : scripts) {
                 if (script.html().contains("window.pageData=")) {

@@ -14,6 +14,8 @@ import org.springframework.util.StringUtils;
 public class JsonUtil {
     /**
      * 将json格式化为字符串，然后根据key取值
+     * 格式 ：data.item_info.url
+     *       item_list[0].video.play_addr.url_list[0]
      *
      * @param jsonStr
      * @param key
@@ -31,7 +33,6 @@ public class JsonUtil {
             } else {
                 return JSON.parseObject(jsonStr).getString(key);
             }
-
         } else {
             String[] keys = key.split("\\.");
             for (String s : keys) {

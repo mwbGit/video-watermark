@@ -1,5 +1,7 @@
 package com.harry.videowatermark.common;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.http.HttpUtil;
 import com.google.gson.Gson;
 import com.harry.videowatermark.bean.ApiResult;
 import com.harry.videowatermark.model.VideoModel;
@@ -26,7 +28,8 @@ import java.util.Map;
 public class TextUtil {
     private static Logger logger = LoggerFactory.getLogger(TextUtil.class);
 
-    public static final String UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Version/12.0 Safari/604.1";
+    public static final String UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
+
     public static final String API = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=";
 
     /**
@@ -38,7 +41,7 @@ public class TextUtil {
      * @return
      */
     public static String getSubString(String text, String left, String right) {
-        String result = "";
+        String result;
         int zLen;
         if (left == null || left.isEmpty()) {
             zLen = 0;
@@ -59,7 +62,7 @@ public class TextUtil {
     }
 
     /**
-     * 抽取URL
+     * 抽取URL 获取短链接
      *
      * @param urlStr
      * @return
@@ -79,6 +82,48 @@ public class TextUtil {
         return StringUtils.EMPTY;
     }
 
+
+    /**
+     * 从路径中提取itemId 抖音
+     *
+     * @param url
+     * @return
+     */
+    public static String parseItemIdFromUrl(String url) {
+        String ans = "";
+        String[] strings = url.split("/");
+        // after video.
+        for (String string : strings) {
+            // 非数字字符
+            if (StringUtils.isNumeric(string)) {
+                return string;
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * 获取重定向 URL
+     *
+     * @param url
+     * @return
+     */
+    public static String redirectUrl(String url) {
+        return HttpUtil.createGet(url).addHeaders(headers()).execute().header("Location");
+    }
+
+    /**
+     * 模拟
+     *
+     * @return headers
+     */
+    public static HashMap<String, String> headers() {
+        HashMap<String, String> headers = MapUtil.newHashMap();
+        headers.put("User-Agent", UA);
+        return headers;
+    }
+
+
     /**
      * 短连接转换成长地址
      *
@@ -86,6 +131,7 @@ public class TextUtil {
      * @return
      * @throws IOException
      */
+    @Deprecated
     public static String convertUrl(String shortUrl) throws IOException {
         URL inputURL = new URL(shortUrl);
         URLConnection urlConn = inputURL.openConnection();
@@ -97,30 +143,13 @@ public class TextUtil {
     }
 
     /**
-     * 从路径中提取itemId
-     *
-     * @param url
-     * @return
-     */
-    public static String parseItemIdFromUrl(String url) {
-        String ans = "";
-        String[] strings = url.split("/");
-        // after video.
-        for (String string : strings) {
-            if (StringUtils.isNumeric(string)) {
-                return string;
-            }
-        }
-        return ans;
-    }
-
-    /**
      * 解析抖音API获取视频结果.
      *
      * @param itemId
      * @return
      * @throws Exception
      */
+    @Deprecated
     public static ApiResult requestToApi(String itemId) throws Exception {
         String url = API + itemId;
         HttpURLConnection httpClient =
@@ -154,6 +183,7 @@ public class TextUtil {
      * @param fileUrl
      * @throws IOException
      */
+    @Deprecated
     public static void downloadVideo(VideoModel result, String fileUrl) throws IOException {
         Map<String, String> headers = new HashMap<>();
         headers.put("Connection", "keep-alive");
@@ -174,6 +204,7 @@ public class TextUtil {
 
         logger.info("save file to ==> {}", file.getAbsolutePath());
     }
+
 
     public static void main(String[] args) {
         String urlStr =
@@ -201,5 +232,4 @@ public class TextUtil {
 
         System.out.println(extractUrl(urlStr));
     }
-
 }

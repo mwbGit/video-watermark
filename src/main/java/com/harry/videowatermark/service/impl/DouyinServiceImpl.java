@@ -1,7 +1,7 @@
 package com.harry.videowatermark.service.impl;
 
-import com.harry.videowatermark.bean.ApiResult;
-import com.harry.videowatermark.bean.ItemList;
+import cn.hutool.http.HttpUtil;
+import com.harry.videowatermark.common.JsonUtil;
 import com.harry.videowatermark.common.TextUtil;
 import com.harry.videowatermark.model.VideoModel;
 import com.harry.videowatermark.service.VideoService;
@@ -18,34 +18,41 @@ import java.io.IOException;
  */
 @Service
 public class DouyinServiceImpl implements VideoService {
-
+    public static final String API = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=";
 
     @Override
     public VideoModel parseUrl(String strUrl) {
+        VideoModel videoModel = new VideoModel();
+
         try {
+            // 获取 短链接 URL
             String shortUrl = TextUtil.extractUrl(strUrl);
-            String oriUrl = TextUtil.convertUrl(shortUrl);
-            String itemId = TextUtil.parseItemIdFromUrl(oriUrl);
-            ApiResult apiBean = TextUtil.requestToApi(itemId);
-            VideoModel videoModel = new VideoModel();
-            ItemList item = apiBean.getItemList().get(0);
-            String originVideoUrl = item.getVideo().getPlayAddr().getUrlList().get(0);
-            // 去水印视频转换.
-            videoModel.setName(item.getShareInfo().getShareTitle());
-            videoModel.setPlayAddr(originVideoUrl.replace("playwm", "play"));
-            videoModel.setMusicUrl(item.getMusic().getPlayUrl().getUri());
-			// videoModel.setCover(cover);
+
+            // 获取重定向Url
+            String redirectUrl = TextUtil.redirectUrl(shortUrl);
+
+            // 获取 itemId
+            String itemId = TextUtil.parseItemIdFromUrl(redirectUrl);
+
+            // 获取接口数据
+            String result = HttpUtil.createGet(API + itemId).addHeaders(TextUtil.headers()).execute().body();
+
+            //此处的视频地址为带水印的地址，需要将地址中的playwm替换为play 在浏览器中打开将请求的User-Agent修改为手机
+            String playAddr = JsonUtil.getJsonValue(result, "item_list[0].video.play_addr.url_list[0]");
+            videoModel.setName(JsonUtil.getJsonValue(result, "item_list[0].desc"));
+            videoModel.setPlayAddr(playAddr.replace("playwm", "play"));
+            videoModel.setCover(JsonUtil.getJsonValue(result, "item_list[0].video.cover.url_list[0]"));
             return videoModel;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-
     }
 
     public static void main(String[] args) throws IOException {
-        VideoModel videoModel = new DouyinServiceImpl().parseUrl("https://v.douyin.com/JMv1b5M/");
-        TextUtil.downloadVideo(videoModel, "/Users/honghh/Downloads/");
+        System.out.println(new DouyinServiceImpl().parseUrl("https://v.douyin.com/JMv1b5M/"));
+//        VideoModel videoModel = new DouyinServiceImpl().parseUrl("https://v.douyin.com/JMv1b5M/");
+//        TextUtil.downloadVideo(videoModel, "/Users/honghh/Downloads/");
 
     }
 }

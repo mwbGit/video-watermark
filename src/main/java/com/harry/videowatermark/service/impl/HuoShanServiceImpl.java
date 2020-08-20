@@ -1,12 +1,11 @@
 package com.harry.videowatermark.service.impl;
 
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
 import com.harry.videowatermark.common.JsonUtil;
 import com.harry.videowatermark.common.TextUtil;
 import com.harry.videowatermark.model.VideoModel;
 import com.harry.videowatermark.service.VideoService;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,31 +18,36 @@ import org.springframework.stereotype.Service;
 @Service
 public class HuoShanServiceImpl implements VideoService {
 
-	@Override
-	public VideoModel parseUrl(String url) {
-		// TODO Auto-generated method stub
-		VideoModel videoModel=new VideoModel();
-		/*HttpRequest request = HttpRequest.get(url);
-		String res = request.body();
-		System.out.println(res);*/
-		try {
-			OkHttpClient okHttpClient = new OkHttpClient();
-			Request request = new Request.Builder().url(url).build();
-			Response response = okHttpClient.newCall(request).execute();
-			String result=response.body().string();
-			System.out.println(result);
-			result= TextUtil.getSubString(result, "create({d:", "});");
-			String videoId= JsonUtil.getJsonValue(result, "video.uri");
-			videoModel.setPlayAddr("http://hotsoon.snssdk.com/hotsoon/item/video/_playback/?video_id="+videoId);
-			videoModel.setCover(JsonUtil.getJsonValue(result, "video.cover.url_list[0]"));
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		return videoModel;
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(new HuoShanServiceImpl().parseUrl("https://reflow.huoshan.com/hotsoon/s/th01P3Eu700/"));
-	}
+    public static final String API = "https://share.huoshan.com/api/item/info?item_id=";
+
+    @Override
+    public VideoModel parseUrl(String strUrl) {
+        VideoModel videoModel = new VideoModel();
+        try {
+            // 获取 短链接 URL
+            String url = TextUtil.extractUrl(strUrl);
+
+            // 获取重定向Url
+            String redirectUrl = TextUtil.redirectUrl(url);
+
+            // 获取 itemId
+            String itemId = TextUtil.getSubString(redirectUrl, "item_id=", "&tag=");
+
+            // 获取接口数据
+            String result = HttpUtil.createGet(API + itemId).addHeaders(TextUtil.headers()).execute().body();
+
+            String playAddr = JsonUtil.getJsonValue(result, "data.item_info.url");
+            videoModel.setName(JsonUtil.getJsonValue(result, "data.item_info.item_id"));
+            videoModel.setPlayAddr(playAddr.replace("reflow", "source").replace("mark=2", "mark=0"));
+            videoModel.setCover(JsonUtil.getJsonValue(result, "data.item_info.cover"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return videoModel;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new HuoShanServiceImpl().parseUrl("https://share.huoshan.com/hotsoon/s/75UUtJcnYa8/ "));
+    }
 }
