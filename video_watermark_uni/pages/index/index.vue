@@ -50,13 +50,15 @@
 
 		<view class="watermark">
 			<view class="watermark-input">
-				<input id="inputText" placeholder=" 请复制视频链接，粘贴到这里" type="text" v-model="splj"></input>
-
+				<input id="inputText" placeholder=" 请复制视频链接，粘贴到这里" type="text" v-model="strUrl"></input>
+				<button @tap="clear()" class="clearInputText">
+					<image src="../../static/icon-clear.png" v-if="strUrl==''"></image>
+					<image src="../../static/icon-clear-active.png" v-else></image>
+				</button>
 			</view>
-			<button @click="scljs()" class="parsing" hoverClass="parsing-btn-hover">一键去除水印</button>
-			<textarea class="lj" type="text" value="" v-model="lj"></textarea>
-			<button @click="download()" class="parsing" hoverClass="parsing-btn-hover">下载</button>
-
+			<button @click="scplayAddrs()" class="parsing" hoverClass="parsing-btn-hover">一键去除水印</button>
+			<textarea class="playAddr" type="text" value="" v-model="playAddr"></textarea>
+			<button @click="download()" class="parsing" hoverClass="parsing-btn-hover" v-if="playAddr.length>0">下载</button>
 		</view>
 	</view>
 </template>
@@ -67,8 +69,8 @@
 		data() {
 			return {
 				title: '用于去除自己作品在抖音、快手、微博、美拍、微视等常见短视频平台上的视频水印',
-				splj: '',
-				lj: '',
+				strUrl: '',
+				playAddr: '',
 				//APIKEY注册网址 https://www.tianapi.com/
 				APIKEY: '89852e79c644934168fa180e92ecefe6',
 
@@ -77,26 +79,41 @@
 		onLoad() {
 
 		},
+		onShow() {
+			_self = this;
+			// 获取粘贴板数据
+			uni.getClipboardData({
+				success: function(res) {
+					// console.log(res.data);
+					if (res.data.length > 0) {
+						_self.strUrl = res.data;
+					}
+				}
+			});
+		},
 		methods: {
-			scljs() {
-				console.log(this.splj);
+			scplayAddrs() {
 				_self = this;
 				uni.request({
-					url: 'http://192.168.1.22:8080/video/parse?url=' + _self.splj,
+					url: 'http://192.168.1.22:8080/video/parse',
 					data: {
-
+						url: _self.strUrl
 					},
-					method: "GET",
+					method: "POST",
 					success: function(res) {
 						console.log(res.data.playAddr);
-						_self.lj = res.data.playAddr;
+
+						_self.playAddr = res.data.playAddr;
+					},
+					fail: function(err) {
+
 					}
 				});
 			},
 			download() {
-				console.log(this.lj);
+				console.log(this.playAddr);
 				uni.downloadFile({
-					url: this.lj, //仅为示例，并非真实的资源
+					url: this.playAddr, //仅为示例，并非真实的资源
 					success: (res) => {
 						if (res.statusCode === 200) {
 							console.log('下载成功');
@@ -105,7 +122,8 @@
 								filePath: res.tempFilePath,
 								success: function(re) {
 									uni.showToast({
-										title: re.toString(),
+										title: '下载成功',
+										icon: 'success',
 										duration: 2000
 									});
 									console.log('save success');
@@ -114,6 +132,10 @@
 						}
 					}
 				});
+			},
+			clear() {
+				this.strUrl = '';
+				this.playAddr = '';
 			}
 		}
 	};
@@ -372,7 +394,7 @@
 		padding-left: 30rpx;
 	}
 
-	#clearInputText {
+	.clearInputText {
 		display: flex;
 		width: 100rpx;
 		height: 100%;
@@ -381,11 +403,11 @@
 		align-items: center;
 	}
 
-	#clearInputText:after {
+	.clearInputText:after {
 		border: none;
 	}
 
-	#clearInputText image {
+	.clearInputText image {
 		display: block;
 		width: 30rpx;
 		height: 30rpx;
