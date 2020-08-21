@@ -5,6 +5,8 @@ import com.harry.videowatermark.common.JsonUtil;
 import com.harry.videowatermark.common.TextUtil;
 import com.harry.videowatermark.model.VideoModel;
 import com.harry.videowatermark.service.VideoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,6 +20,8 @@ import java.io.IOException;
  */
 @Service
 public class DouyinServiceImpl implements VideoService {
+
+    private static Logger logger = LoggerFactory.getLogger(DouyinServiceImpl.class);
     public static final String API = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=";
 
     @Override
@@ -42,6 +46,7 @@ public class DouyinServiceImpl implements VideoService {
             videoModel.setName(JsonUtil.getJsonValue(result, "item_list[0].desc"));
             videoModel.setPlayAddr(playAddr.replace("playwm", "play"));
             videoModel.setCover(JsonUtil.getJsonValue(result, "item_list[0].video.cover.url_list[0]"));
+            logger.info("解析地址：{},返回视频地址：{}", shortUrl, videoModel.getPlayAddr());
             return videoModel;
         } catch (Exception e) {
             e.printStackTrace();

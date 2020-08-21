@@ -1,8 +1,8 @@
 {
-    "name" : "视频工具",
+    "name" : "Video工具",
     "appid" : "__UNI__83A3874",
     "description" : "用于去除自己作品在抖音、快手、微博、美拍、微视等常见短视频平台上的视频水印",
-    "versionName" : "1.0.0",
+    "versionName" : "1.0.1",
     "versionCode" : "100",
     "transformPx" : false,
     /* 5+App特有相关 */
@@ -105,5 +105,9 @@
     },
     "mp-toutiao" : {
         "usingComponents" : true
+    },
+    "h5" : {
+        "title" : "视频工具",
+        "domain" : "http://192.168.1.22:8081"
     }
 }

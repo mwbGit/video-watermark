@@ -1,11 +1,12 @@
 package com.harry.videowatermark.service.impl;
 
 import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONUtil;
 import com.harry.videowatermark.common.JsonUtil;
 import com.harry.videowatermark.common.TextUtil;
 import com.harry.videowatermark.model.VideoModel;
 import com.harry.videowatermark.service.VideoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class HuoShanServiceImpl implements VideoService {
+    private static Logger logger = LoggerFactory.getLogger(HuoShanServiceImpl.class);
 
     public static final String API = "https://share.huoshan.com/api/item/info?item_id=";
 
@@ -25,10 +27,10 @@ public class HuoShanServiceImpl implements VideoService {
         VideoModel videoModel = new VideoModel();
         try {
             // 获取 短链接 URL
-            String url = TextUtil.extractUrl(strUrl);
+            String shortUrl = TextUtil.extractUrl(strUrl);
 
             // 获取重定向Url
-            String redirectUrl = TextUtil.redirectUrl(url);
+            String redirectUrl = TextUtil.redirectUrl(shortUrl);
 
             // 获取 itemId
             String itemId = TextUtil.getSubString(redirectUrl, "item_id=", "&tag=");
@@ -40,7 +42,7 @@ public class HuoShanServiceImpl implements VideoService {
             videoModel.setName(JsonUtil.getJsonValue(result, "data.item_info.item_id"));
             videoModel.setPlayAddr(playAddr.replace("reflow", "source").replace("mark=2", "mark=0"));
             videoModel.setCover(JsonUtil.getJsonValue(result, "data.item_info.cover"));
-
+            logger.info("解析地址：{},返回视频地址：{}", shortUrl, videoModel.getPlayAddr());
         } catch (Exception e) {
             e.printStackTrace();
         }

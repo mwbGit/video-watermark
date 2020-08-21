@@ -1,6 +1,5 @@
 package com.harry.videowatermark.service.impl;
 
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.http.HttpUtil;
 import com.harry.videowatermark.common.JsonUtil;
 import com.harry.videowatermark.common.TextUtil;
@@ -10,9 +9,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
 
 /**
  * Description:
@@ -23,6 +22,7 @@ import java.util.HashMap;
  */
 @Service
 public class KuaiShouServiceImpl implements VideoService {
+    private static Logger logger = LoggerFactory.getLogger(HuoShanServiceImpl.class);
 
     @Override
     public VideoModel parseUrl(String strUrl) {
@@ -48,7 +48,7 @@ public class KuaiShouServiceImpl implements VideoService {
                     videoModel.setCover(JsonUtil.getJsonValue(result, "video.shareCover"));
                 }
             }
-
+            logger.info("解析地址：{},返回视频地址：{}", shortUrl, videoModel.getPlayAddr());
         } catch (Exception e) {
             e.printStackTrace();
         }

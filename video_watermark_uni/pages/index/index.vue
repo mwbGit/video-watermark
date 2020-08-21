@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<view class="platforms">
-			<text class="platforms-title">Harry去水印助手支持以下平台,部分平台不支持直接保存到相册</text>
+			<text class="platforms-title">Harry去水印助手</text>
 			<view class="page-body">
 				<view class="page-section page-section-spacing swiper">
 					<swiper>
@@ -70,9 +70,7 @@
 			return {
 				title: '用于去除自己作品在抖音、快手、微博、美拍、微视等常见短视频平台上的视频水印',
 				strUrl: '',
-				playAddr: '',
-				//APIKEY注册网址 https://www.tianapi.com/
-				APIKEY: '89852e79c644934168fa180e92ecefe6',
+				playAddr: ''
 
 			};
 		},
@@ -95,7 +93,7 @@
 			scplayAddrs() {
 				_self = this;
 				uni.request({
-					url: 'http://192.168.1.22:8080/video/parse',
+					url: 'http://honghh.top:8088/video/parse',
 					data: {
 						url: _self.strUrl
 					},
@@ -111,9 +109,9 @@
 				});
 			},
 			download() {
-				console.log(this.playAddr);
+				// console.log(this.playAddr);
 				uni.downloadFile({
-					url: this.playAddr, //仅为示例，并非真实的资源
+					url: this.playAddr, 
 					success: (res) => {
 						if (res.statusCode === 200) {
 							console.log('下载成功');
