@@ -14,21 +14,42 @@ import org.slf4j.LoggerFactory;
 public class VideoFactory {
 
     private static Logger logger = LoggerFactory.getLogger(VideoFactory.class);
-
+    //抖音
     public static final String DOUYIN = "douyin.com";
     public static final String IESDOUYIN = "iesdouyin.com";
-
+    //火山
     public static final String HUOSHAN = "huoshan.com";
-
+    //快手
     public static final String KUAISHOU = "kuaishou.com";
     public static final String GIFSHOW = "gifshow.com";
     public static final String CHENZHONGTECH = "chenzhongtech.com";
-
+    //皮皮虾
     public static final String PIPIX = "pipix.com";
-
+    //微视
     public static final String WEISHI = "weishi.qq.com";
+    //最右
     public static final String IZUIYOU = "izuiyou.com";
+    //西瓜
+    public static final String XIGUA = "xigua.com";
+    //头条
+    public static final String TOUTIAOIMG_COM = "toutiaoimg.com";
+    public static final String TOUTIAOIMG_CN = "toutiaoimg.cn";
 
+
+//                'bili'=>['b23.tv','www.bilibili.com'],
+//                'livideo'=>['www.pearvideo.com'],
+//                'meipai'=>['www.meipai.com'],
+//                'momo'=>['immomo.com'],
+//                'pipigaoxiao'=>['ippzone.com'],
+//                'quanminggaoxiao'=>['longxia.music.xiaomi.com'],
+//                'shuabao'=>['h5.shua8cn.com','m.shua8cn.com'],
+//                'toutiao'=>['toutiaoimg.com','toutiaoimg.cn'],
+//                'xiaokaxiu'=>['mobile.xiaokaxiu.com'],
+//                'xigua'=>['xigua.com'],
+//                'weibo'=>['weibo.com','weibo.cn'],
+//                'newweibo'=>['video.weibo.com/show'],
+//                'miaopai'=>['miaopai.com'],
+//                'qqvideo'=>['m.v.qq.com'],
 
     public static VideoService getVideo(String type)
             throws InstantiationException, IllegalAccessException {
@@ -56,6 +77,14 @@ public class VideoFactory {
         } else if (type.contains(IZUIYOU)) {
 
             return ZuiYouServiceImpl.class.newInstance();
+
+        } else if (type.contains(TOUTIAOIMG_CN) || type.contains(TOUTIAOIMG_COM)) {
+
+            return TouTiaoServiceImpl.class.newInstance();
+
+        } else if (type.contains(XIGUA)) {
+
+            return XiGuaServiceImpl.class.newInstance();
 
         } else {
             logger.error("哎呀！找不到相应的实例化类啦！");

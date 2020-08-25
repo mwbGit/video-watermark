@@ -17,10 +17,10 @@ import org.springframework.stereotype.Service;
  * Copyright (C) Harry技术
  */
 @Service
-public class PiPiXServiceImpl implements VideoService {
+public class TouTiaoServiceImpl implements VideoService {
+    private static Logger logger = LoggerFactory.getLogger(TouTiaoServiceImpl.class);
 
-    private static Logger logger = LoggerFactory.getLogger(PiPiXServiceImpl.class);
-    public static final String API = "https://h5.pipix.com/bds/webapi/item/detail/?item_id=";
+    public static final String PLAY_ADDR_API = "http://hotsoon.snssdk.com/hotsoon/item/video/_playback/?video_id=";
 
     @Override
     public VideoModel parseUrl(String strUrl) {
@@ -28,17 +28,17 @@ public class PiPiXServiceImpl implements VideoService {
         try {
             // 获取 短链接 URL
             String shortUrl = TextUtil.extractUrl(strUrl);
-            // 获取重定向Url
-            String redirectUrl = TextUtil.redirectUrl(shortUrl);
             // 获取 itemId
-            String itemId = TextUtil.getSubString(redirectUrl, "/item/", "?app_id=");
-            // 获取接口数据
-            String result = HttpUtil.createGet(API + itemId).addHeaders(TextUtil.headers()).execute().body();
+            String itemId = TextUtil.parseItemIdFromUrl(shortUrl);
 
-            videoModel.setName(JsonUtil.getJsonValue(result, "data.item.video.text"));
-            videoModel.setPlayAddr(JsonUtil.getJsonValue(result, "data.item.video.video_fallback.url_list[0].url"));
-            videoModel.setCover(JsonUtil.getJsonValue(result, "data.item.video.video_fallback.cover_image.url_list[0].url"));
+            String result = HttpUtil.createGet("https://m.365yg.com/i" + itemId + "/info/?i=" + itemId)
+                    .addHeaders(TextUtil.headers()).execute().body();
 
+            String videoId = JsonUtil.getJsonValue(result, "data.video_id");
+
+            videoModel.setName(JsonUtil.getJsonValue(result, "data.title"));
+            videoModel.setPlayAddr(PLAY_ADDR_API + videoId);
+            videoModel.setCover(JsonUtil.getJsonValue(result, "data.poster_url"));
             logger.info("解析地址：{},返回视频地址：{}", shortUrl, videoModel.getPlayAddr());
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,6 +47,6 @@ public class PiPiXServiceImpl implements VideoService {
     }
 
     public static void main(String[] args) {
-        System.out.println(new PiPiXServiceImpl().parseUrl("https://h5.pipix.com/s/Jr9JxQK/"));
+        System.out.println(new TouTiaoServiceImpl().parseUrl("https://m.toutiaoimg.cn/group/6838410637660389896/?app=news_article&timestamp=1597992540&group_id=6838410637660389896"));
     }
 }
