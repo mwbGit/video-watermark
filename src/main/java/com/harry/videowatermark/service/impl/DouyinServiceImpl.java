@@ -42,9 +42,10 @@ public class DouyinServiceImpl implements VideoService {
             String result = HttpUtil.createGet(API + itemId).addHeaders(TextUtil.headers()).execute().body();
 
             //此处的视频地址为带水印的地址，需要将地址中的playwm替换为play 在浏览器中打开将请求的User-Agent修改为手机
-            String playAddr = JsonUtil.getJsonValue(result, "item_list[0].video.play_addr.url_list[0]");
+            String playAddr = JsonUtil.getJsonValue(result, "item_list[0].video.play_addr.url_list[0]").replace("playwm", "play");
+            //再次重定向  获取地址
             videoModel.setName(JsonUtil.getJsonValue(result, "item_list[0].desc"));
-            videoModel.setPlayAddr(playAddr.replace("playwm", "play"));
+            videoModel.setPlayAddr(TextUtil.redirectUrl(playAddr));
             videoModel.setCover(JsonUtil.getJsonValue(result, "item_list[0].video.cover.url_list[0]"));
             logger.info("解析地址：{},返回视频地址：{}", shortUrl, videoModel.getPlayAddr());
             return videoModel;
@@ -58,6 +59,11 @@ public class DouyinServiceImpl implements VideoService {
         System.out.println(new DouyinServiceImpl().parseUrl("https://v.douyin.com/JMv1b5M/"));
 //        VideoModel videoModel = new DouyinServiceImpl().parseUrl("https://v.douyin.com/JMv1b5M/");
 //        TextUtil.downloadVideo(videoModel, "/Users/honghh/Downloads/");
+
+//        String url = "https://aweme.snssdk.com/aweme/v1/play/?video_id=v0200fee0000bsts1akkfl9eg4gi63dg&ratio=720p&line=0";
+//        // 获取重定向Url
+//        String redirectUrl = TextUtil.redirectUrl(url);
+//        System.out.println(redirectUrl);
 
     }
 }
