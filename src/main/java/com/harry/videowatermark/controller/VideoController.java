@@ -5,6 +5,7 @@ import com.harry.videowatermark.service.VideoService;
 import com.harry.videowatermark.service.impl.VideoFactory;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -20,7 +21,12 @@ import java.util.Objects;
 @CrossOrigin
 public class VideoController {
     @PostMapping("parse")
-    public VideoModel parse(@RequestBody String url) throws InstantiationException, IllegalAccessException {
+    public VideoModel parse(@RequestBody Map<String, String> params) throws InstantiationException, IllegalAccessException {
+        String url = params.get("url");
+        if (url == null) {
+            return new VideoModel();
+        }
+
         VideoService videoService = VideoFactory.getVideo(url);
         if (Objects.isNull(videoService)) {
             return new VideoModel();
