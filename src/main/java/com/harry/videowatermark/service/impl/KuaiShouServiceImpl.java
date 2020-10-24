@@ -56,6 +56,6 @@ public class KuaiShouServiceImpl implements VideoService {
     }
 
     public static void main(String[] args) {
-        System.out.println(new KuaiShouServiceImpl().parseUrl("https://v.kuaishou.com/8lXgzr"));
+        System.out.println(new KuaiShouServiceImpl().parseUrl("https://v.kuaishou.com/8fps78"));
     }
 }

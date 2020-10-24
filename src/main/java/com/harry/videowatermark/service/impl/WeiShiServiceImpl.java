@@ -50,7 +50,8 @@ public class WeiShiServiceImpl implements VideoService {
     }
 
     public static void main(String[] args) {
-        System.out.println(new WeiShiServiceImpl().parseUrl("https://h5.weishi.qq.com/weishi/feed/7jhhxy88J1Kb72PIt/wsfeed?wxplay=1&id=7jhhxy88J1Kb72PIt&spid=1596273090628829&qua=v1_and_weishi_8.1.0_588_212011431_d&chid=100081014&pkg=3670&attach=cp_reserves3_1000370011"));
+//        System.out.println(new WeiShiServiceImpl().parseUrl("https://h5.weishi.qq.com/weishi/feed/7jhhxy88J1Kb72PIt/wsfeed?wxplay=1&id=7jhhxy88J1Kb72PIt&spid=1596273090628829&qua=v1_and_weishi_8.1.0_588_212011431_d&chid=100081014&pkg=3670&attach=cp_reserves3_1000370011"));
+        System.out.println(new WeiShiServiceImpl().parseUrl("论当代大龄女青年的枯燥生活…>>https://h5.weishi.qq.com/weishi/feed/7dPuvopGI1KitOMwL/wsfeed?wxplay=1&id=7dPuvopGI1KitOMwL&spid=9028756019097772032&qua=v1_iph_weishi_8.3.1_397_app_a&chid=100081014&pkg=3670&attach=cp_reserves3_1000370011"));
     }
 
 }
