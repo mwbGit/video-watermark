@@ -1,5 +1,7 @@
 package com.harry.videowatermark.interceptor;
 
+import cn.hutool.core.map.MapUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -7,14 +9,11 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Map;
 
-/**
- * 描述:
- *
- * @author mengweibo@kanzhun.com
- * @create 2020/7/31
- */
 
+@Slf4j
 @Configuration
 public class WebAuthInterceptor extends HandlerInterceptorAdapter {
     private static final Logger accessLog = LoggerFactory.getLogger(WebAuthInterceptor.class);
@@ -22,8 +21,8 @@ public class WebAuthInterceptor extends HandlerInterceptorAdapter {
 
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        accessLog.info("---access---total_access:{},ip:{},uri:{},params:{}", TOTAL_ACCESS++, getIpAddress(request), request.getRequestURI(), request.getQueryString());
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        accessLog.info("---access---total_access:{},ip: {} ,uri:{},params:{}", TOTAL_ACCESS++, getIpAddress(request), request.getRequestURI(), getBody(request));
         return true;
     }
 
@@ -39,5 +38,33 @@ public class WebAuthInterceptor extends HandlerInterceptorAdapter {
             ip = request.getRemoteAddr();
         }
         return ip;
+    }
+
+    public String getBody(HttpServletRequest request) {
+        try {
+            Map<String, String[]> paramMap = request.getParameterMap();
+            if (MapUtil.isEmpty(paramMap)) {
+                return request.getQueryString();
+            }
+            StringBuilder builder = new StringBuilder();
+            String[] vals;
+            for (Map.Entry entry : paramMap.entrySet()) {
+                vals = (String[]) entry.getValue();
+                builder.append(entry.getKey());
+                builder.append("=");
+                if (vals != null && vals.length > 0) {
+                    builder.append(vals.length == 1 ? vals[0] : Arrays.toString(vals));
+                }
+                builder.append("&");
+            }
+            return builder.toString().substring(0, builder.length() - 1);
+        } catch (Exception e) {
+            log.error("WebAuthInterceptor.getBody err", e);
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("abcd".substring(0,"abcd".length()-1));
     }
 }

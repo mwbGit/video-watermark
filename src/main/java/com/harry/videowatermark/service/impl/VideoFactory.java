@@ -15,24 +15,25 @@ public class VideoFactory {
 
     private static Logger logger = LoggerFactory.getLogger(VideoFactory.class);
     //抖音
-    public static final String DOUYIN = "douyin.com";
-    public static final String IESDOUYIN = "iesdouyin.com";
+    public static final String DOUYIN = "douyin";
+    public static final String IESDOUYIN = "iesdouyin";
     //火山
-    public static final String HUOSHAN = "huoshan.com";
+    public static final String HUOSHAN = "huoshan";
     //快手
-    public static final String KUAISHOU = "kuaishou.com";
+    public static final String KUAISHOU = "kuaishou";
+    public static final String KUAISHOU_APP = "kuaishouapp.com";
     public static final String GIFSHOW = "gifshow.com";
     public static final String CHENZHONGTECH = "chenzhongtech.com";
     //皮皮虾
-    public static final String PIPIX = "pipix.com";
+    public static final String PIPIX = "pipix";
     //微视
-    public static final String WEISHI = "weishi.qq.com";
+    public static final String WEISHI = "weishi";
     //最右
-    public static final String IZUIYOU = "izuiyou.com";
+    public static final String IZUIYOU = "izuiyou";
     //西瓜
-    public static final String XIGUA = "xigua.com";
+    public static final String XIGUA = "xigua";
     //头条
-    public static final String TOUTIAOIMG_COM = "toutiaoimg.com";
+    public static final String TOUTIAOIMG_COM = "toutiaoimg";
     public static final String TOUTIAOIMG_CN = "toutiaoimg.cn";
 
 
@@ -62,7 +63,7 @@ public class VideoFactory {
 
             return HuoShanServiceImpl.class.newInstance();
 
-        } else if (type.contains(KUAISHOU) || type.contains(GIFSHOW) || type.contains(CHENZHONGTECH)) {
+        } else if (type.contains(KUAISHOU) || type.contains(GIFSHOW) || type.contains(CHENZHONGTECH) || type.contains(KUAISHOU_APP)) {
 
             return KuaiShouServiceImpl.class.newInstance();
 

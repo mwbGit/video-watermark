@@ -26,6 +26,12 @@ public class VideoModel {
      */
     private String musicUrl;
 
+    public VideoModel() {
+    }
+
+    public VideoModel(String playAddr) {
+        this.playAddr = playAddr;
+    }
 
     public String getName() {
         return name;

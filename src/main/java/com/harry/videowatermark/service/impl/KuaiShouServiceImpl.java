@@ -55,7 +55,8 @@ public class KuaiShouServiceImpl implements VideoService {
         return videoModel;
     }
 
-    public static void main(String[] args) {
-        System.out.println(new KuaiShouServiceImpl().parseUrl("https://v.kuaishou.com/8fps78"));
+    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
+        VideoService v = VideoFactory.getVideo("https://v.kuaishouapp.com/s/1KUgyelR");
+        System.out.println(new KuaiShouServiceImpl().parseUrl("https://v.kuaishouapp.com/s/1KUgyelR"));
     }
 }

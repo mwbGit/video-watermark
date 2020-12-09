@@ -76,7 +76,7 @@
             <AppenderRef ref="ERROR_FILE"/>
         </AsyncLogger>
 
-        <AsyncLogger name="com.harry.videowatermark.controller" additivity="false" level="INFO">
+        <AsyncLogger name="com.harry.videowatermark" additivity="false" level="INFO">
             <AppenderRef ref="INFO_FILE"/>
             <AppenderRef ref="WARN_FILE"/>
             <AppenderRef ref="ERROR_FILE"/>
