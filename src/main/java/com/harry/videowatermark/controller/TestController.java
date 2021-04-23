@@ -41,7 +41,8 @@ public class TestController {
 
     @RequestMapping("/b")
     public ApiResult getInfo1(String url) {
+        waterService.addParseRecord("aa", "bb", "cc", true);
 
-        return ApiResult.success(mapper.selectByDevice_id(url));
+        return ApiResult.success(111);
     }
 }

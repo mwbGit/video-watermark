@@ -1,23 +1,24 @@
 package com.harry.videowatermark.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
-import com.alibaba.fastjson.JSON;
 import com.harry.videowatermark.mapper.WaterOrderMapper;
+import com.harry.videowatermark.mapper.WaterParseRecordMapper;
 import com.harry.videowatermark.mapper.WaterParseTimesMapper;
 import com.harry.videowatermark.mapper.WaterVipUrlMapper;
 import com.harry.videowatermark.model.WaterOrder;
+import com.harry.videowatermark.model.WaterParseRecord;
 import com.harry.videowatermark.model.WaterParseTimes;
 import com.harry.videowatermark.model.WaterVipUrl;
-import com.harry.videowatermark.service.WaterOrderService;
 import com.harry.videowatermark.service.WaterService;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,12 +43,14 @@ public class WaterServiceImpl implements WaterService {
 
     @Autowired
     private WaterOrderMapper waterOrderMapper;
+    @Autowired
+    private WaterParseRecordMapper waterParseRecordMapper;
 
     @PostConstruct
     public void init() {
         List<WaterVipUrl> waterVipUrls = vipUrlMapper.selectAll();
         if (CollUtil.isNotEmpty(waterVipUrls)) {
-            URL_TYPE_MAP = waterVipUrls.stream().filter(item -> item.getStatus() > 0).collect(Collectors.toMap(WaterVipUrl::getUrl,o -> o));
+            URL_TYPE_MAP = waterVipUrls.stream().filter(item -> item.getStatus() > 0).collect(Collectors.toMap(WaterVipUrl::getUrl, o -> o));
         }
     }
 
@@ -56,7 +59,7 @@ public class WaterServiceImpl implements WaterService {
         try {
             if (URL_TYPE_MAP.containsKey(url)) {
                 WaterVipUrl waterVipUrl = URL_TYPE_MAP.get(url);
-                DateTime now =  new DateTime();
+                DateTime now = new DateTime();
                 WaterOrder waterOrder = new WaterOrder();
                 waterOrder.setProduct_id(waterVipUrl.getType() == 0 ? "105" : "106");
                 waterOrder.setExpires_date_ms(waterVipUrl.getType() == 0 ? now.plusMonths(1).toDate() : now.plusYears(1).toDate());
@@ -95,10 +98,26 @@ public class WaterServiceImpl implements WaterService {
             waterParseTimes.setApp_version(appVersion);
             waterParseTimes.setDevice_id(deviceId);
             timesMapper.insertSelective(waterParseTimes);
-        } else if (times > 0) {
+        } else {
             waterParseTimes.setTimes(waterParseTimes.getTimes() + times);
+            waterParseTimes.setUpdate_time(new Date());
             timesMapper.updateByPrimaryKeySelective(waterParseTimes);
         }
         return waterParseTimes.getTimes();
+    }
+
+    @Async
+    @Override
+    public void addParseRecord(String deviceId, String appVersion, String url, boolean ok) {
+        WaterParseRecord waterParseRecord = new WaterParseRecord();
+        try {
+            waterParseRecord.setDevice_id(deviceId);
+            waterParseRecord.setApp_version(appVersion);
+            waterParseRecord.setUrl(url);
+            waterParseRecord.setStatus(ok ? 1 : 0);
+            waterParseRecordMapper.insertSelective(waterParseRecord);
+        } catch (Exception e) {
+            log.error("addParseRecord err record={}", waterParseRecord);
+        }
     }
 }

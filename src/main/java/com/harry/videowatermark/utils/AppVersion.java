@@ -7,10 +7,8 @@ package com.harry.videowatermark.utils;
  * @create 2020/11/30
  */
 public class AppVersion {
-
-    public static final String V_1_1 = "1.1";
-    public static final String V_1_1_1 = "1.1.1";
-    public static final String V_1_1_2 = "1.1.2";
-    public static final String V_1_1_3 = "1.1.2";
+    // todo
+    public static final String AUDIT_V = "1.1.4";
+    public static final int MAX_V = 114;
 
 }

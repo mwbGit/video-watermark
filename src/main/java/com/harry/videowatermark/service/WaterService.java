@@ -11,4 +11,6 @@ public interface WaterService {
     Integer vipUrlType(String url, String deviceId);
 
     int incrementParseTimes(String deviceId, String appVersion,int times);
+
+    void addParseRecord(String deviceId, String appVersion, String url, boolean ok);
 }
