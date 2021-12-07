@@ -12,5 +12,5 @@ public interface WaterService {
 
     int incrementParseTimes(String deviceId, String appVersion,int times);
 
-    void addParseRecord(String deviceId, String appVersion, String url, boolean ok);
+    void addParseRecord(String ip, String deviceId, String appVersion, String url, boolean ok);
 }

@@ -11,7 +11,9 @@ import com.harry.videowatermark.model.WaterParseRecord;
 import com.harry.videowatermark.model.WaterParseTimes;
 import com.harry.videowatermark.model.WaterVipUrl;
 import com.harry.videowatermark.service.WaterService;
+import com.harry.videowatermark.utils.IpUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -108,12 +110,14 @@ public class WaterServiceImpl implements WaterService {
 
     @Async
     @Override
-    public void addParseRecord(String deviceId, String appVersion, String url, boolean ok) {
+    public void addParseRecord(String ip, String deviceId, String appVersion, String url, boolean ok) {
         WaterParseRecord waterParseRecord = new WaterParseRecord();
         try {
             waterParseRecord.setDevice_id(deviceId);
             waterParseRecord.setApp_version(appVersion);
             waterParseRecord.setUrl(url);
+            waterParseRecord.setIp(StringUtils.defaultString(ip));
+            waterParseRecord.setRegion(StringUtils.defaultString(IpUtil.getCityInfo(ip)));
             waterParseRecord.setStatus(ok ? 1 : 0);
             waterParseRecordMapper.insertSelective(waterParseRecord);
         } catch (Exception e) {

@@ -32,6 +32,8 @@ public class VideoFactory {
     public static final String IZUIYOU = "izuiyou";
     //西瓜
     public static final String XIGUA = "xigua";
+    //好看123
+    public static final String HAOKAN = "haokan";
     //头条
     public static final String TOUTIAOIMG_COM = "toutiaoimg";
     public static final String TOUTIAOIMG_CN = "toutiaoimg.cn";
@@ -86,6 +88,10 @@ public class VideoFactory {
         } else if (type.contains(XIGUA)) {
 
             return XiGuaServiceImpl.class.newInstance();
+
+//        } else if (type.contains(HAOKAN)) {
+
+//            return HaokanServiceImpl.class.newInstance();
 
         } else {
             logger.error("哎呀！找不到相应的实例化类啦！");

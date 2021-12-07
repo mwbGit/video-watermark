@@ -35,5 +35,8 @@ public class WaterParseRecord {
     private Date create_time;
     @Column(name = "update_time")
     private Date update_time;
-
+    @Column(name = "ip")
+    private String ip;
+    @Column(name = "region")
+    private String region;
 }

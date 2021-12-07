@@ -10,6 +10,7 @@ import com.harry.videowatermark.service.WaterOrderService;
 import com.harry.videowatermark.service.WaterService;
 import com.harry.videowatermark.service.impl.VideoFactory;
 import com.harry.videowatermark.utils.AppVersion;
+import com.harry.videowatermark.utils.IpUtil;
 import com.harry.videowatermark.utils.MD5Util;
 import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
@@ -71,14 +73,15 @@ public class VideoController {
 //        }
             result.put("limitTimes", waterService.incrementParseTimes(deviceId, version, 0) > 1);
             WaterOrder waterOrder = waterOrderService.getByDeviceId(deviceId);
-            result.put("vipUser", false);
-            if (waterOrder != null) {
-                Date vipDate = waterOrder.getExpires_date_ms();
-                result.put("vipUser", vipDate.after(new Date()));
-                result.put("vipDate", vipDate.before(new Date()) ? "会员已过期" : "");
-            } else if (OPEN == 102) {
-                result.put("vipDate", "新用户免费试用三天，试用期间可随时取消订阅");
-            }
+            result.put("vipUser", true);
+            result.put("vipDate", "答谢老用户，您已是永久会员");
+//            if (waterOrder != null) {
+//                Date vipDate = waterOrder.getExpires_date_ms();
+//                result.put("vipUser", vipDate.after(new Date()));
+//                result.put("vipDate", vipDate.before(new Date()) ? "会员已过期" : "");
+//            } else if (OPEN == 102) {
+//                result.put("vipDate", "新用户免费试用三天，试用期间可随时取消订阅");
+//            }
             result.put("upgrade", Integer.parseInt(StringUtils.replace(version, ".", "")) < AppVersion.MAX_V);
         } catch (Exception e) {
             log.error("VideoController.info err", e);
@@ -115,9 +118,11 @@ public class VideoController {
      * @return
      */
     @RequestMapping("/parse")
-    public ApiResult parse(@RequestParam(value = "version", required = false) String version, @RequestParam("url") String url,
+    public ApiResult parse(HttpServletRequest request,
+                           @RequestParam(value = "version", required = false) String version, @RequestParam("url") String url,
                            @RequestParam("sign") String sign, @RequestParam("source") String source, @RequestParam(value = "deviceId", required = false) String deviceId) {
-        log.info("VideoController.parse,deviceId= {}, version={} source={},url={}, sign={},", deviceId, version, source, url, sign);
+        String ip = IpUtil.getIpAddr(request);
+        log.info("VideoController.parse,deviceId= {}, version={} source={},url={}, sign={},ip={}", deviceId, version, source, url, sign, ip);
         try {
             String shortUrl = TextUtil.extractUrl(url);
             if (shortUrl == null) {
@@ -129,17 +134,17 @@ public class VideoController {
             if (LAST_URL != null && LAST_URL.getKey().equals(shortUrl)) {
                 return ApiResult.success(new VideoModel(LAST_URL.getValue()));
             }
-            WaterOrder waterOrder = waterOrderService.getByDeviceId(deviceId);
-            if (waterOrder == null || waterOrder.getExpires_date_ms().before(new Date())) {
-                if (waterService.incrementParseTimes(deviceId, version, 0) > 6) {
-                    return ApiResult.failed("视频提取次数已用完,会员中心领取免费试用！");
-                }
-            }
+//            WaterOrder waterOrder = waterOrderService.getByDeviceId(deviceId);
+//            if (waterOrder == null || waterOrder.getExpires_date_ms().before(new Date())) {
+//                if (waterService.incrementParseTimes(deviceId, version, 0) > 6) {
+//                    return ApiResult.failed("视频提取次数已用完,会员中心领取免费试用！");
+//                }
+//            }
 
             VideoService videoService = VideoFactory.getVideo(shortUrl);
             if (videoService != null) {
                 VideoModel videoModel = videoService.parseUrl(shortUrl);
-                waterService.addParseRecord(deviceId, version, shortUrl, videoModel != null);
+                waterService.addParseRecord(ip, deviceId, version, shortUrl, videoModel != null);
                 if (videoModel != null) {
                     waterService.incrementParseTimes(deviceId, version, 1);
                     LAST_URL = new Pair<>(shortUrl, videoModel.getPlayAddr());
@@ -152,6 +157,7 @@ public class VideoController {
                 if (type != null) {
                     return ApiResult.failed("已为您添加会员一" + (type == 0 ? "个月" : "年") + ",重新打开App生效");
                 }
+                waterService.addParseRecord(ip, deviceId, version, shortUrl, false);
             }
             log.warn("VideoController.parse warn url= {} ,version={}", url, version);
             return ApiResult.failed("暂不支持改链接类型");

@@ -1,6 +1,7 @@
 package com.harry.videowatermark.interceptor;
 
 import cn.hutool.core.map.MapUtil;
+import com.harry.videowatermark.utils.IpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,22 +23,8 @@ public class WebAuthInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        accessLog.info("---access---total_access:{},ip: {} ,uri:{},params:{}", TOTAL_ACCESS++, getIpAddress(request), request.getRequestURI(), getBody(request));
+        accessLog.info("---access---total_access:{},ip: {} ,uri:{},params:{}", TOTAL_ACCESS++, IpUtil.getIpAddr(request), request.getRequestURI(), getBody(request));
         return true;
-    }
-
-    public static String getIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
     }
 
     public String getBody(HttpServletRequest request) {
