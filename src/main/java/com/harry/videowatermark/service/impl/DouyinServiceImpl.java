@@ -46,6 +46,7 @@ public class DouyinServiceImpl implements VideoService {
             //再次重定向  获取地址
             videoModel.setName(JsonUtil.getJsonValue(result, "item_list[0].desc"));
 //            videoModel.setPlayAddr(TextUtil.redirectUrl(playAddr));
+            System.out.println(result);
             videoModel.setPlayAddr(playAddr);
             videoModel.setCover(JsonUtil.getJsonValue(result, "item_list[0].video.cover.url_list[0]"));
             logger.info("解析地址：{},返回视频地址：{}", shortUrl, videoModel.getPlayAddr());
@@ -57,7 +58,7 @@ public class DouyinServiceImpl implements VideoService {
     }
 
     public static void main(String[] args) throws IOException {
-        System.out.println(new DouyinServiceImpl().parseUrl("https://v.douyin.com/RG4wgAn/"));
+        System.out.println(new DouyinServiceImpl().parseUrl("https://v.douyin.com/LjWfwkk/"));
 //        VideoModel videoModel = new DouyinServiceImpl().parseUrl("https://v.douyin.com/JMv1b5M/");
 //        TextUtil.downloadVideo(videoModel, "/Users/honghh/Downloads/");
 

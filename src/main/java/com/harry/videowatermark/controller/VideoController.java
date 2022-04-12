@@ -131,9 +131,9 @@ public class VideoController {
             if (!sign.equals(MD5Util.md5(url, MD5_SAFE))) {
                 return ApiResult.failed("签名错误");
             }
-            if (LAST_URL != null && LAST_URL.getKey().equals(shortUrl)) {
-                return ApiResult.success(new VideoModel(LAST_URL.getValue()));
-            }
+//            if (LAST_URL != null && LAST_URL.getKey().equals(shortUrl)) {
+//                return ApiResult.success(new VideoModel(LAST_URL.getValue()));
+//            }
 //            WaterOrder waterOrder = waterOrderService.getByDeviceId(deviceId);
 //            if (waterOrder == null || waterOrder.getExpires_date_ms().before(new Date())) {
 //                if (waterService.incrementParseTimes(deviceId, version, 0) > 6) {
@@ -146,6 +146,10 @@ public class VideoController {
                 VideoModel videoModel = videoService.parseUrl(shortUrl);
                 waterService.addParseRecord(ip, deviceId, version, shortUrl, videoModel != null);
                 if (videoModel != null) {
+                    if (!videoModel.getPlayAddr().contains("mp4")) {
+                        videoModel.setPlayAddr(videoModel.getPlayAddr() + ".mp4");
+                    }
+                    log.info("VideoController. shortUrl={}, return={}", shortUrl, videoModel.getPlayAddr());
                     waterService.incrementParseTimes(deviceId, version, 1);
                     LAST_URL = new Pair<>(shortUrl, videoModel.getPlayAddr());
                     return ApiResult.success(videoModel);
